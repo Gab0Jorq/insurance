@@ -5,10 +5,11 @@ import pickle
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.preprocessing import StandardScaler
 
-#load pikle model
+#Cargando el modelo y el Scaler
 model = pickle.load(open('insurance_model_gb.sav', 'rb'))
 sc = pickle.load(open('scaler.sav','rb'))
 
+#Función para predecir el costo del seguro
 def model_predict(data, modelo):
     #Transformación de variables para que funcione el modelo guardado.
     data['sex_male'] = [1 if i == 'male' else 0 for i in data['sex']]
@@ -23,42 +24,58 @@ def model_predict(data, modelo):
     #El modelo predice el valor logarítmico, por lo que hay que transformarlo.
     prediction_log = modelo.predict(data)
     prediction = np.exp(prediction_log)  
-    return prediction
+    return prediction[0]
 
 
 def run():
     from PIL import Image
-    image = Image.open('images/logo_git.png')
     image_hospital = Image.open('images/insurance.jpg')
 
-    st.sidebar.info('Esta aplicación fue creada para predecir el cobro del seguro de salud de los clientes, según sus características.')
-    st.sidebar.success('https://github.com/Gab0Jorq')
-
+    #Creación de la barra lateral
+    st.sidebar.markdown('Esta aplicación fue creada para estimar el costo de un seguro de salud de alguna institución, según las características \
+    de los clientes, para mayor información puede ver el código utilizado [pinchando aquí](https://github.com/Gab0Jorq/insurance/blob/master/insurance.ipynb).')
     st.sidebar.image(image_hospital)
 
-    st.title('Ingresa tus datos, para saber un estimado del costo de tu seguro de salud.')
+    #Título de la aplicación
+    st.title('Ingrese sus datos:')
 
-    age = st.number_input('Edad', min_value=1, max_value=100, value=25)
-    sex = st.selectbox('Género', ['male', 'female'])
-    bmi = st.number_input('BMI', min_value=10, max_value=50, value=10)
-    children = st.selectbox('Hijos', [0,1,2,3,4,5,6])
-    if st.checkbox('Fumador'):
-        smoker = 'yes'
-    else:
-        smoker = 'no'
-    region = st.selectbox('region', ['southwest', 'northwest', 'northeast', 'southeast'])
-    input_dict = {'age':age, 'bmi':bmi, 'children':children, 'sex': sex, 'region':region, 'smoker':smoker}
-    input_df = pd.DataFrame([input_dict])
-    output = ''
+    #Creación del formulario
+    with st.form(key='formulario'):
+        #Ingreso de datos
+        age = st.number_input('Edad', min_value=1, max_value=100, value=25)
+        sex = st.selectbox('Género', ['male', 'female'])
+        bmi = st.number_input('BMI', min_value=10, max_value=50, value=10)
+        children = st.selectbox('Hijos', [0,1,2,3,4,5,6])
+        if st.checkbox('Fumador'):
+            smoker = 'yes'
+        else:
+            smoker = 'no'
+        region = st.selectbox('Region', ['southwest', 'northwest', 'northeast', 'southeast'])
 
-
-    if st.button('Predecir'):
+        #Transformación de la data para el formato del modelo.
+        input_dict = {'age':age, 'bmi':bmi, 'children':children, 'sex': sex, 'region':region, 'smoker':smoker}
+        input_df = pd.DataFrame([input_dict])
         
-        output = model_predict(data=input_df, modelo = model)
-        output = '$' + str(round(output[0], 0))
+        #Creación del botón de predicción
+        submit_button = st.form_submit_button(label = 'Enviar')
+        
+        #Acción del botón de predicción
+        if submit_button==True:
+            #Predicción del costo del seguro
+            output = model_predict(data=input_df, modelo = model)
+            output_str = '$' + str(int(round(output, 0)))
 
-        st.success('El precio es: {} {}'.format(output, 'USD'))
+            #Mostrar el resultado
+            st.success('El costo aproximado es: {} {}'.format(output_str, 'USD'))
+            st.write('')
 
+            #En caso de que la persona sea fumadora.
+            #Mostrar la diferencia del costo aproximado.
+            if smoker == 'yes':
+                input_df['smoker'] = 'no'
+                output2 = model_predict(data=input_df, modelo = model)
+                output_str2 = '$' + str(int(round(output2, 0))) + ' USD'
+                st.metric(label = 'El costo aproximado si no fuera fumador es:', value = output_str2, delta = '-$' + str(int(round(-output2+output, 0))), delta_color = 'inverse')
 
 if __name__ == '__main__':
     run()

@@ -1,8 +1,20 @@
 # Insurance
 
-## Demostración
+## Demostración rápida
 
 ![insurance_demo](images/insurance.gif)
+
+
+
+## Tabla de contenidos
+
+[Descripción](#Descripción)
+
+[Instalación](#instalación)
+
+[Utilización de la aplicación](#utilización-de-la-aplicación)
+
+[Principales descubrimientos](#principales-descubrimientos)
 
 ## Descripción
 
@@ -29,10 +41,6 @@ El seguro de vida es una cobertura de riesgo que se aplica a una persona que est
     [Scikit-learn:](https://scikit-learn.org/) Es una librería de Python que nos permite trabajar con modelos de machine learning.
 
     [Streamlit](https://streamlit.io) Es una librería de Python que nos permite crear de manera sencilla aplicaciones web, generalmente utilizada para crear demostraciones.
-
-## Tabla de contenidos
-
-[Instalación](#instalación)
 
 ## Instalación
 

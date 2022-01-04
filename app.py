@@ -44,7 +44,7 @@ def run():
         #Ingreso de datos
         age = st.number_input('Edad', min_value=1, max_value=100, value=25)
         sex = st.selectbox('Género', ['male', 'female'])
-        bmi = st.number_input('BMI', min_value=10, max_value=50, value=10)
+        bmi = st.number_input('BMI', min_value=10.0, max_value=50.0, value=10.0, step=0.1, format='%.1f')
         children = st.selectbox('Hijos', [0,1,2,3,4,5,6])
         if st.checkbox('Fumador'):
             smoker = 'yes'
